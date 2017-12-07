@@ -1,7 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var id;
-var quant;
+var id = 0;
+var quant = 0;
 
 var connection = mysql.createConnection({
 
@@ -58,7 +58,17 @@ function purchaseItem(){
 	inquirer.prompt([
 		{
 			name: "purchase",
-			message: "Which item do you want to purchase? (ID #)"
+			message: "Which item do you want to purchase? (ID #)",
+			validate: function(input) {
+
+				var done = this.async();
+		
+					if (input != parseInt(input)) {
+						done("Return just a single letter or number");
+						return;
+					}
+					done(null, true);	
+				}
 		}
 	]).then(function(ans) {
 		connection.query("SELECT * FROM bamazon.products WHERE item_id = " + ans.purchase, function(err, res){
@@ -69,7 +79,7 @@ function purchaseItem(){
 				}
 				else {
 				id = ans.purchase;
-				console.log(res.affectedRows);
+				console.log(res);
 				howMany();
 				}
 			}
@@ -121,7 +131,17 @@ function howMany() {
 	inquirer.prompt([
 		{
 			name: "quantity",
-			message: "How many do you want to purchase?"
+			message: "How many do you want to purchase?",
+			validate: function(input) {
+
+				var done = this.async();
+		
+					if (input != parseInt(input)) {
+						done("Return just a single letter or number");
+						return;
+					}
+					done(null, true);	
+				}
 		}
 	]).then(function(ans){
 		quant = ans.quantity;
@@ -132,9 +152,9 @@ function howMany() {
 					howMany();
 				}
 				else {
-				console.log("Order made for " + ans.quantity);
-				console.log(res);
-				// orderMade();
+				// console.log("Order made for " + ans.quantity);
+				// console.log(res);
+					userConfirm();
 				}
 			}
 			else {
@@ -146,6 +166,42 @@ function howMany() {
 	})
 }
 
+
+function userConfirm() {
+	// console.log(quant);
+	inquirer.prompt([
+		{
+			name: "confirm",
+			message: "Are you sure you want to order " + quant + " of the item?",
+			type: "list",
+			choices: ["Yes", "No"]
+		}
+	]).then(function(ans) {
+		if (ans.confirm === "No") {
+			console.log("\n---------------------------")
+			console.log("Cancelling Order...")
+			console.log("Returning to the main menu...")
+			console.log("---------------------------\n")
+			userInput();
+		}
+		else if (ans.confirm === "Yes") {
+			console.log("\n---------------------------")
+			console.log("Order made for " + quant);
+			console.log("---------------------------\n")
+			// orderMade();
+			userInput();
+		}
+
+		else {
+			console.log("There was an error... try again");
+			userConfirm();
+		}
+
+
+	})
+}
+
+//  function orderMade() {
 		// connection.query(
 		//	"UPDATE bamazon.products SET ? WHERE ?",
 		// 		[ 
@@ -162,3 +218,4 @@ function howMany() {
 	// 				}
 	// 			}
 		// )
+//  }
