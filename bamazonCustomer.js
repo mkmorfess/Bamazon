@@ -64,7 +64,7 @@ function purchaseItem(){
 				var done = this.async();
 		
 					if (input != parseInt(input)) {
-						done("Return just a single letter or number");
+						done("Return just a number");
 						return;
 					}
 					done(null, true);	
@@ -73,7 +73,8 @@ function purchaseItem(){
 	]).then(function(ans) {
 		connection.query("SELECT * FROM bamazon.products WHERE item_id = " + ans.purchase, function(err, res){
 			if (!err) {
-				if (res.stock_quantity <= 0) {
+				if (res[0].stock_quantity <= 0) {
+					console.log(res);
 					console.log("Insufficient Supply. Please wait for us to restock!");
 					purchaseItem();
 				}
@@ -137,7 +138,7 @@ function howMany() {
 				var done = this.async();
 		
 					if (input != parseInt(input)) {
-						done("Return just a single letter or number");
+						done("Return just a number");
 						return;
 					}
 					done(null, true);	
@@ -147,8 +148,8 @@ function howMany() {
 		quant = ans.quantity;
 		connection.query("SELECT * FROM bamazon.products WHERE item_id = " + id, function(err, res){
 			if (!err) {
-				if (res.stock_quantity - ans.quantity <= 0) {
-					console.log("Insufficient Supply. Try ordering a smaller amount! There is only " + res.stock_quantity + " left");
+				if (res[0].stock_quantity - ans.quantity <= 0) {
+					console.log("Insufficient Supply. Try ordering a smaller amount! \nThere is only " + res[0].stock_quantity + " left in stock");
 					howMany();
 				}
 				else {
