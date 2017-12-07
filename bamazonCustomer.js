@@ -1,7 +1,11 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var id = 0;
+var idItem = 0;
 var quant = 0;
+var item;
+var price;
+var inStock;
+var purchase;
 
 var connection = mysql.createConnection({
 
@@ -74,13 +78,17 @@ function purchaseItem(){
 		connection.query("SELECT * FROM bamazon.products WHERE item_id = " + ans.purchase, function(err, res){
 			if (!err) {
 				if (res[0].stock_quantity <= 0) {
-					console.log(res);
+					console.log("Item: " + res[0].item_id + " | Item Name: " + res[0].product_name + " | Price: " + res[0].price);
+					howMany();
 					console.log("Insufficient Supply. Please wait for us to restock!");
 					purchaseItem();
 				}
 				else {
-				id = ans.purchase;
-				console.log(res);
+				idItem = ans.purchase;
+				item = res[0].product_name;
+				price = res[0].price;
+				inStock = res[0].stock_quantity;
+				console.log("Item: " + res[0].item_id + " | Item Name: " + res[0].product_name + " | Price: " + res[0].price);
 				howMany();
 				}
 			}
@@ -146,7 +154,7 @@ function howMany() {
 		}
 	]).then(function(ans){
 		quant = ans.quantity;
-		connection.query("SELECT * FROM bamazon.products WHERE item_id = " + id, function(err, res){
+		connection.query("SELECT * FROM bamazon.products WHERE item_id = " + idItem, function(err, res){
 			if (!err) {
 				if (res[0].stock_quantity - ans.quantity <= 0) {
 					console.log("Insufficient Supply. Try ordering a smaller amount! \nThere is only " + res[0].stock_quantity + " left in stock");
@@ -173,7 +181,7 @@ function userConfirm() {
 	inquirer.prompt([
 		{
 			name: "confirm",
-			message: "Are you sure you want to order " + quant + " of the item?",
+			message: "Are you sure you want to order " + quant + " of " + item + " for " + price + " each?",
 			type: "list",
 			choices: ["Yes", "No"]
 		}
@@ -189,8 +197,7 @@ function userConfirm() {
 			console.log("\n---------------------------")
 			console.log("Order made for " + quant);
 			console.log("---------------------------\n")
-			// orderMade();
-			userInput();
+			orderMade();
 		}
 
 		else {
@@ -202,21 +209,26 @@ function userConfirm() {
 	})
 }
 
-//  function orderMade() {
-		// connection.query(
-		//	"UPDATE bamazon.products SET ? WHERE ?",
-		// 		[ 
-		// 			{
-
-		// 			},
-		// 			{
-
-		// 			}
-		// 		],
-	// 			function(err, res){
-	// 				if (!err) {
-	// 					console.log(res)
-	// 				}
-	// 			}
-		// )
-//  }
+ function orderMade() {
+ 	purchase = inStock - quant;
+		connection.query(
+			"UPDATE bamazon.products SET ? WHERE ?",
+				[ 
+					{
+						stock_quantity: purchase
+					},
+					{
+						item_id: idItem
+					}
+				],
+				function(err, res){
+					if (!err) {
+						console.log("Back to main menu...\n");
+						userInput();
+					}
+					else {
+						console.log(err);
+					}
+				}
+		)
+ }
