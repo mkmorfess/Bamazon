@@ -1,5 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var id;
+var quant;
 
 var connection = mysql.createConnection({
 
@@ -51,6 +53,36 @@ function inStockItems(){
 }
 
 
+function purchaseItem(){
+
+	inquirer.prompt([
+		{
+			name: "purchase",
+			message: "Which item do you want to purchase? (ID #)"
+		}
+	]).then(function(ans) {
+		connection.query("SELECT * FROM bamazon.products WHERE item_id = " + ans.purchase, function(err, res){
+			if (!err) {
+				if (res.stock_quantity <= 0) {
+					console.log("Insufficient Supply. Please wait for us to restock!");
+					purchaseItem();
+				}
+				else {
+				id = ans.purchase;
+				console.log(res.affectedRows);
+				howMany();
+				}
+			}
+			else {
+				console.log(err);
+			}
+		});
+
+	})
+
+}
+
+
 function userInput(){
 
 	inquirer.prompt([
@@ -69,6 +101,9 @@ function userInput(){
 			case "List items in stock":
 				inStockItems();
 				break;
+			case "Purchase Item":
+				purchaseItem();
+				break;
 			case "End Connection":
 				connection.end();
 				break;
@@ -81,3 +116,49 @@ function userInput(){
 }
 
 
+function howMany() {
+    
+	inquirer.prompt([
+		{
+			name: "quantity",
+			message: "How many do you want to purchase?"
+		}
+	]).then(function(ans){
+		quant = ans.quantity;
+		connection.query("SELECT * FROM bamazon.products WHERE item_id = " + id, function(err, res){
+			if (!err) {
+				if (res.stock_quantity - ans.quantity <= 0) {
+					console.log("Insufficient Supply. Try ordering a smaller amount! There is only " + res.stock_quantity + " left");
+					howMany();
+				}
+				else {
+				console.log("Order made for " + ans.quantity);
+				console.log(res);
+				// orderMade();
+				}
+			}
+			else {
+				console.log(err);
+			}
+		});
+		
+		
+	})
+}
+
+		// connection.query(
+		//	"UPDATE bamazon.products SET ? WHERE ?",
+		// 		[ 
+		// 			{
+
+		// 			},
+		// 			{
+
+		// 			}
+		// 		],
+	// 			function(err, res){
+	// 				if (!err) {
+	// 					console.log(res)
+	// 				}
+	// 			}
+		// )
