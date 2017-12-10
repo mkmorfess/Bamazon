@@ -3,6 +3,9 @@ var inquirer = require("inquirer");
 var product;
 var currentStock;
 var itemID;
+var productName;
+var deptName;
+var newPrice;
 
 
 
@@ -223,4 +226,163 @@ function howMuch() {
 				}
 		})
 	})
+}
+
+
+function addProd() {
+
+	inquirer.prompt([
+		{
+			name: "prodName",
+			message: "What is the name of the product"
+		}
+	]).then(function(ans){
+
+		productName = ans.prodName;
+		inquirer.prompt([
+			{
+				name: "prodConfirm",
+				message: "Are you sure the product name is " + productName + "?",
+				type: "list",
+				choices: ["Yes", "No"]
+			}
+		]).then(function(ans){
+
+			if(ans.prodConfirm === "Yes") {
+				addDept();
+			}
+			else if(ans.prodConfirm === "No") {
+				addProd();
+			}
+			else {
+				console.log("Something went wrong...");
+				addProd();
+			}
+
+		})
+
+	})
+
+}
+
+
+function addDept(){
+
+	inquirer.prompt([
+		{
+			name: "depName",
+			message: "What is the department name for " + productName
+		}
+	]).then(function(ans){
+
+		deptName = ans.depName;
+		inquirer.prompt([
+			{
+				name: "deptConfirm",
+				message: "Are you sure the department name is " + deptName + "?",
+				type: "list",
+				choices: ["Yes", "No"]
+			}
+		]).then(function(ans){
+
+			if(ans.deptConfirm === "Yes") {
+				addPrice();
+			}
+			else if(ans.deptConfirm === "No") {
+				addDept();
+			}
+			else {
+				console.log("Something went wrong...");
+				addDept();
+			}
+
+		})
+
+	})
+
+
+
+}
+
+
+function addPrice(){
+
+		inquirer.prompt([
+		{
+			name: "priceName",
+			message: "What is the price for " + productName
+		}
+	]).then(function(ans){
+
+		newPrice = parseFloat(ans.priceName);
+		inquirer.prompt([
+			{
+				name: "priceConfirm",
+				message: "Are you sure the price is " + newPrice + "?",
+				type: "list",
+				choices: ["Yes", "No"]
+			}
+		]).then(function(ans){
+
+			if(ans.priceConfirm === "Yes") {
+				confirmAdd();
+			}
+			else if(ans.priceConfirm === "No") {
+				addPrice();
+			}
+			else {
+				console.log("Something went wrong...");
+				addPrice();
+			}
+
+		})
+
+	})
+
+}
+
+
+function confirmAdd() {
+
+
+		inquirer.prompt([
+			{
+				name: "confirmAdd",
+				message: "Are you sure the product is " + productName + ", the department name is " + deptName + ", and the price is " + newPrice + "?",
+				type: "list",
+				choices: ["Yes", "No"]
+			}
+		]).then(function(ans){
+
+			if(ans.confirmAdd === "Yes") {
+				addNewRow();
+			}
+			else if(ans.confirmAdd === "No") {
+				managerInput();
+			}
+			else {
+				console.log("Something went wrong...");
+				managerInput();
+			}
+
+		})
+
+	
+
+
+}
+
+
+function addNewRow() {
+
+
+	connection.query("INSERT INTO products (product_name, department_name, price) VALUES ('" + productName + "', '" + deptName + "', '" + newPrice + "');", function(err, res) {
+
+		if (err) throw err;
+		console.log("New Product Added");
+		managerInput();
+
+	})	
+
+
 }
