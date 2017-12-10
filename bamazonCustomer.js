@@ -26,10 +26,13 @@ connection.connect(function(err){
 
 function listItems(){
 
-	connection.query("SELECT item_id, product_name, department_name, price FROM bamazon.products", function(err, res) {
+	connection.query("SELECT * FROM bamazon.products", function(err, res) {
 		if (!err) {
 			for (var i = 0; i < res.length; i++) {
-			console.log(res[i]);
+			console.log("ID # " + res[i].item_id);
+			console.log("Name: " + res[i].product_name);
+			console.log("Department " + res[i].department_name);
+			console.log("Price " + res[i].price);
 			console.log("\n----------------------------------------\n");
 		}
 			userInput();
@@ -42,10 +45,13 @@ function listItems(){
 }
 
 function inStockItems(){
-	connection.query("SELECT item_id, product_name, department_name, price FROM bamazon.products WHERE stock_quantity > 0", function(err, res) {
+	connection.query("SELECT * FROM bamazon.products WHERE stock_quantity > 0", function(err, res) {
 		if (!err) {
 			for (var i = 0; i < res.length; i++) {
-			console.log(res[i]);
+			console.log("ID # " + res[i].item_id);
+			console.log("Name: " + res[i].product_name);
+			console.log("Department " + res[i].department_name);
+			console.log("Price " + res[i].price);
 			console.log("\n----------------------------------------\n");
 		}
 			userInput();
@@ -76,20 +82,31 @@ function purchaseItem(){
 		}
 	]).then(function(ans) {
 		connection.query("SELECT * FROM bamazon.products WHERE item_id = " + ans.purchase, function(err, res){
+
+		
 			if (!err) {
-				if (res[0].stock_quantity <= 0) {
+
+				if (res.length > 0) {
+
+					if (res[0].stock_quantity <= 0) {
+						console.log("Item: " + res[0].item_id + " | Item Name: " + res[0].product_name + " | Price: " + res[0].price);
+						howMany();
+						console.log("Insufficient Supply. Please wait for us to restock!");
+						purchaseItem();
+					}
+
+					else {
+					idItem = ans.purchase;
+					item = res[0].product_name;
+					price = res[0].price;
+					inStock = res[0].stock_quantity;
 					console.log("Item: " + res[0].item_id + " | Item Name: " + res[0].product_name + " | Price: " + res[0].price);
 					howMany();
-					console.log("Insufficient Supply. Please wait for us to restock!");
-					purchaseItem();
+					}
 				}
 				else {
-				idItem = ans.purchase;
-				item = res[0].product_name;
-				price = res[0].price;
-				inStock = res[0].stock_quantity;
-				console.log("Item: " + res[0].item_id + " | Item Name: " + res[0].product_name + " | Price: " + res[0].price);
-				howMany();
+					console.log("There is no item found with the ID # of '" + ans.purchase + "' try again...");
+					purchaseItem();
 				}
 			}
 			else {
@@ -127,7 +144,7 @@ function userInput(){
 				connection.end();
 				break;
 			default:
-				console.log("This works");
+				console.log("Something went wrong...");
 		}
 
 
@@ -156,14 +173,33 @@ function howMany() {
 		quant = ans.quantity;
 		connection.query("SELECT * FROM bamazon.products WHERE item_id = " + idItem, function(err, res){
 			if (!err) {
-				if (res[0].stock_quantity - ans.quantity <= 0) {
-					console.log("Insufficient Supply. Try ordering a smaller amount! \nThere is only " + res[0].stock_quantity + " left in stock");
-					howMany();
+				if (ans.quantity != 0) {
+					if (res[0].stock_quantity - ans.quantity <= 0) {
+						console.log("Insufficient Supply. Try ordering a smaller amount! \nThere is only " + res[0].stock_quantity + " left in stock");
+						howMany();
+					}
+					else {
+					// console.log("Order made for " + ans.quantity);
+					// console.log(res);
+						userConfirm();
+					}
 				}
 				else {
-				// console.log("Order made for " + ans.quantity);
-				// console.log(res);
-					userConfirm();
+					inquirer.prompt([
+						{
+							name: "unsure",
+							message: "You pressed 0.. Do you want to return to the main menu?",
+							type: "list",
+							choices: ["Yes", "No"]
+						}
+					]).then(function(ans) {
+						if(ans.unsure === "Yes") {
+							userInput();
+						}
+						if(ans.unsure === "No"){
+							howMany();
+						}
+					})
 				}
 			}
 			else {
@@ -181,7 +217,7 @@ function userConfirm() {
 	inquirer.prompt([
 		{
 			name: "confirm",
-			message: "Are you sure you want to order " + quant + " of " + item + " for " + price + " each?",
+			message: "Are you sure you want to order " + quant + " of " + item + " for " + price + " each? Total: " + quant * parseFloat(price),
 			type: "list",
 			choices: ["Yes", "No"]
 		}
