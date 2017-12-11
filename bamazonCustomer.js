@@ -126,11 +126,14 @@ function userInput(){
 			name: "user",
 			message: "What would you like to do?",
 			type: "list",
-			choices: ["List all items", "List items in stock", "Purchase Item", "End Connection"]
+			choices: ["Search for item by...", "List all items", "List items in stock", "Purchase Item", "End Connection"]
 		}
 	]).then(function(ans) {
 
 		switch(ans.user) {
+			case "Search for item by...":
+				searchBy();
+				break;
 			case "List all items":
 				listItems();
 				break;
@@ -268,3 +271,110 @@ function userConfirm() {
 				}
 		)
  }
+
+function searchItem() {
+
+
+	inquirer.prompt([
+		{
+			name: "search",
+			message: "What item are you looking for?"
+		}
+	]).then(function(ans){
+
+
+		connection.query("SELECT * FROM products WHERE product_name like '%" + ans.search + "%'", function(err, res){
+
+
+			if (!err) {
+				if (res.length > 0) {
+					for(var i = 0; i < res.length; i++) {
+						console.log("\n---------------------------")
+						console.log("Item: " + res[i].item_id + " | Item Name: " + res[i].product_name + " | Price: " + res[i].price)
+						console.log("---------------------------\n")
+					}
+					userInput();
+				}
+				else{
+					console.log("No items found by that name...")
+					userInput();
+				}
+			}
+			else {
+				console.log(err);
+			}
+
+		})
+
+	})
+
+}
+
+
+function searchDept() {
+
+
+	inquirer.prompt([
+		{
+			name: "search",
+			message: "Which department do you want to search for?"
+		}
+	]).then(function(ans){
+
+
+		connection.query("SELECT * FROM products WHERE department_name like '%" + ans.search + "%'", function(err, res){
+
+
+			if (!err) {
+				if (res.length > 0) {
+
+					for(var i = 0; i < res.length; i++) {
+						console.log("\n---------------------------")
+						console.log("Item: " + res[i].item_id + " | Item Name: " + res[i].product_name + " | Price: " + res[i].price)
+						console.log("---------------------------\n")
+					}
+					userInput();
+				}
+				else{
+					console.log("No items found by that name...")
+					userInput();
+				}
+			}
+			else {
+				console.log(err);
+			}
+
+		})
+
+	})
+
+}
+
+
+
+
+function searchBy(){
+
+	inquirer.prompt([
+		{
+			name: "searchBy",
+			message: "What do you want to search by?",
+			type: "list",
+			choices: ["Search by Item", "Search by Department"]
+		}
+	]).then(function(ans){
+
+		if (ans.searchBy === "Search by Item") {
+			searchItem();
+		}
+		else if(ans.searchBy === "Search by Department") {
+			searchDept();
+		}
+		else {
+			console.log("Something went wrong...");
+			userInput();
+		}
+
+	})
+
+}
