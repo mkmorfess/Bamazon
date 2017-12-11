@@ -1,4 +1,5 @@
-Bamazon Customer Tutorial:
+*Bamazon Customer Tutorial:*
+
 
 When you first load the program, it’ll give the customer 5 different options to click on: “Search for item by…”, “List all items”, “List items in stock”, “Purchase Item”, and “End Connection”
 
@@ -49,3 +50,80 @@ If the user selects no, it will return them to the main menu, otherwise it will 
 End Connection:
 
 Lastly, the end connection option logs the customer off of Bamazon.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*Bamazon Manager Tutorial:*
+
+When you load the Bamazon Manager script, it gives the manager 5 different options to choose from: “Search “View Products for Sale”, “View Low Inventory”, “Add to Inventory”, “Add New Product”, and “End Connection”.
+
+ 
+
+Search for item by…: 
+This allows the manager to search for individual items if needed for restock purposes or to check on an item for a customer. It will allow the manager to search either by item or by department. The difference between the customer version and the manager version is it allows the manager to see the stock quantity of an item whereas the customer version does not show how much is left in stock.
+ 
+
+View Products for Sale:
+This allows the manager to see the list of all the products we have currently on sale on Bamazon. Very similar to the customer version, but this one displays the stock quantity for each item to the manager.
+
+ 
+
+View Low Inventory:
+This allows the manager to see what items are low on the inventory list. It will show an item if it is below a stock quantity of 6000. This will allow the manager to have time to replenish based on sales.
+ 
+
+Add to Inventory: This allows the manager to order a new shipment of a particular item if the store is low of something. For example, the Nintendo Switch is completely out of stock as seen by the screenshot above…
+It will prompt the manager and ask which ID number they want to add inventory to…
+It will then ask for confirmation that the ID they input was the correct one…
+
+Then it will ask how many of the item do you want to order, in the example, I put 10000 since it’s been sold out.
+Then it will confirm with the manager if they want to add the number they input in.
+
+Once you select Yes, it will add 10000 to the stock quantity and show the manager the old stock quantity versus the new stock quantity.
+
+ 
+
+Add New Product: This allows the manager to add a new item to the inventory. It will prompt the manager for the name, department, and price. It will default the stock to 0 so you’ll have to add inventory once you add the new item.
+It will ask for the name of the item first, then ask for confirmation from the manager…
+Then it will ask for the department name, then ask for confirmation from the manager…
+Then it will ask for the price, and ask for confirmation from the manager…
+
+Once all the information is input… It’ll ask for one more confirmation for all 3: name, department, price.
+
+And if you hit yes, It will add it to the database.
+
+ 
+
+End Connection: This allows for the manager to log out of the current s
+
