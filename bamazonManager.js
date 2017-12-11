@@ -28,11 +28,14 @@ function managerInput(){
 			name: "manager",
 			message: "What would you like to do?",
 			type: "list",
-			choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "End Connection"]
+			choices: ["Search for item by...", "View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "End Connection"]
 		}
 	]).then(function(ans){
 
 		switch (ans.manager){
+			case "Search for item by...":
+				searchBy();
+				break;
 			case "View Products for Sale":
 				viewProducts();
 				break;
@@ -63,7 +66,9 @@ function viewProducts() {
 		if(!err){
 
 			for (var i = 0; i < res.length; i++) {
+				console.log("\n-------------------------------------")
 				console.log("ID: " + res[i].item_id + " | Product: " + res[i].product_name + " | Dept: " + res[i].department_name + " | Price: " + res[i].price + " | Stock Quantity: " + res[i].stock_quantity);
+				console.log("-------------------------------------\n")
 			}
 			managerInput();
 		}
@@ -82,7 +87,9 @@ function viewLow() {
 		if(!err){
 
 			for (var i = 0; i < res.length; i++) {
+				console.log("\n-------------------------------------");
 				console.log("ID: " + res[i].item_id + " | Product: " + res[i].product_name + " | Dept: " + res[i].department_name + " | Price: " + res[i].price + " | Stock Quantity: " + res[i].stock_quantity);
+				console.log("-------------------------------------\n");
 			}
 			managerInput();
 		}
@@ -384,5 +391,109 @@ function addNewRow() {
 
 	})	
 
+
+}
+
+function searchBy(){
+
+	inquirer.prompt([
+		{
+			name: "searchBy",
+			message: "What do you want to search by?",
+			type: "list",
+			choices: ["Search by Item", "Search by Department"]
+		}
+	]).then(function(ans){
+
+		if (ans.searchBy === "Search by Item") {
+			searchItem();
+		}
+		else if(ans.searchBy === "Search by Department") {
+			searchDept();
+		}
+		else {
+			console.log("Something went wrong...");
+			managerInput();
+		}
+
+	})
+
+}
+
+
+function searchItem() {
+
+
+	inquirer.prompt([
+		{
+			name: "search",
+			message: "What item are you looking for?"
+		}
+	]).then(function(ans){
+
+
+		connection.query("SELECT * FROM products WHERE product_name like '%" + ans.search + "%'", function(err, res){
+
+
+			if (!err) {
+				if (res.length > 0) {
+					for(var i = 0; i < res.length; i++) {
+						console.log("\n---------------------------")
+						console.log("Item: " + res[i].item_id + " | Item Name: " + res[i].product_name + " | Price: " + res[i].price + " | Stock Quantity: " + res[i].stock_quantity);
+						console.log("---------------------------\n")
+					}
+					managerInput();
+				}
+				else{
+					console.log("No items found by that name...")
+					managerInput();
+				}
+			}
+			else {
+				console.log(err);
+			}
+
+		})
+
+	})
+
+}
+
+function searchDept() {
+
+
+	inquirer.prompt([
+		{
+			name: "search",
+			message: "Which department do you want to search for?"
+		}
+	]).then(function(ans){
+
+
+		connection.query("SELECT * FROM products WHERE department_name like '%" + ans.search + "%'", function(err, res){
+
+
+			if (!err) {
+				if (res.length > 0) {
+
+					for(var i = 0; i < res.length; i++) {
+						console.log("\n---------------------------")
+						console.log("Item: " + res[i].item_id + " | Item Name: " + res[i].product_name + " | Price: " + res[i].price + " | Stock Quantity: " + res[i].stock_quantity);
+						console.log("---------------------------\n")
+					}
+					managerInput();
+				}
+				else{
+					console.log("No items found by that name...")
+					managerInput();
+				}
+			}
+			else {
+				console.log(err);
+			}
+
+		})
+
+	})
 
 }

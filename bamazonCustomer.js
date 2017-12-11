@@ -89,8 +89,6 @@ function purchaseItem(){
 				if (res.length > 0) {
 
 					if (res[0].stock_quantity <= 0) {
-						console.log("Item: " + res[0].item_id + " | Item Name: " + res[0].product_name + " | Price: " + res[0].price);
-						howMany();
 						console.log("Insufficient Supply. Please wait for us to restock!");
 						purchaseItem();
 					}
