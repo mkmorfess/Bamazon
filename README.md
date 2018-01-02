@@ -107,5 +107,5 @@ And if you hit yes, It will add it to the database.
 ![Main Menu](./screenshots/manager6.png?raw=true "manager6") 
 
 ## End Connection: 
-This allows for the manager to log out of the current s
+This allows for the manager to log out of the current session
 
